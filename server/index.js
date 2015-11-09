@@ -1,10 +1,36 @@
 var generators = require('yeoman-generator'),
     ldf        = require('ldf-server');
 
+var datasourceFilter = [
+    'Datasource',
+    'EmptyDatasource',
+    'IndexDatasource',
+    'MemoryDatasource'
+];
+
+var datasourcePropertiesFilters = {
+    file: [
+        'ExternalHdtDatasource',
+        'HdtDatasource',
+        'JsonLdDatasource',
+        'TurtleDatasource'
+    ],
+    url: [
+        'JsonLdDatasource',
+        'TurtleDatasource'
+    ],
+    endpoint: [
+        'SparqlDatasource'
+    ],
+    defaultGraph: [
+        'SparqlDatasource'
+    ]
+};
+
 var MyBase = generators.Base.extend({
     // Fetch all datasources that are available in the installed ldf server
     getDatasources : function() {
-        return Object.keys(ldf.datasources);
+        return Object.keys(ldf.datasources).filter(function(datasource) { return datasourceFilter.indexOf(datasource) === -1 });
     },
 
     /**
@@ -75,7 +101,7 @@ module.exports = MyBase.extend({
                 type    : 'list',
                 choices : this.datasourceChoices
             }, {
-                name    : 'id',
+                name    : '_id',
                 message : 'Datasource id',
                 default : function(props) {
                     return props.type.toLowerCase();
@@ -89,9 +115,50 @@ module.exports = MyBase.extend({
             }, {
                 name    : 'description',
                 message : 'Description'
+            }, {
+                name    : '_overrideBlankNodePrefix',
+                message : 'Custom blank node prefix?',
+                type    : 'confirm'
+            }, {
+                name    : 'blankNodePrefix',
+                message : 'Blank node prefix',
+                when    : function(props) {
+                    return props._overrideBlankNodePrefix;
+                }
+            }, {
+                name    : 'file',
+                message : 'Local datasource file location (optional)',
+                when    : function(props) {
+                    return datasourcePropertiesFilters.file.indexOf(props.type) >= 0;
+                }
+            }, {
+                name    : 'url',
+                message : 'External datasource url location',
+                when    : function(props) {
+                    return datasourcePropertiesFilters.url.indexOf(props.type) >= 0 && props.file == '';
+                }
+            }, {
+                name    : 'endpoint',
+                message : 'Target endpoint',
+                when    : function(props) {
+                    return datasourcePropertiesFilters.endpoint.indexOf(props.type) >= 0;
+                }
+            }, {
+                name    : 'defaultGraph',
+                message : 'Default graph uri',
+                when    : function(props) {
+                    return datasourcePropertiesFilters.defaultGraph.indexOf(props.type) >= 0;
+                }
             }];
             this.prompt(prompts, function(props) {
-                var id = props.id;
+                var id = props._id;
+                for(var key in props) {
+                    if(key.indexOf('_') === 0) delete props[key];
+                }
+
+                // Delete the file property if we have a set url
+                if(props.url) delete props.file;
+
                 if(!this.props.datasources) this.props.datasources = {};
                 this.props.datasources[id] = props;
                 done();
@@ -127,7 +194,7 @@ module.exports = MyBase.extend({
                 name    : 'logging',
                 message : 'Enable logging?',
                 type    : 'confirm',
-                default : false,
+                default : false
             }, {
                 name    : 'file',
                 message : 'Logging target file',
