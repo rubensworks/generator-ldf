@@ -19,6 +19,7 @@
     "yeoman-generator"
   ],
   "dependencies": {
+    "ldf-server": "^1.1.6",
     "yeoman-generator": "^0.21.1"
   }
 }
