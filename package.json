@@ -1,17 +1,17 @@
 {
-  "name": "generator-ldf-server-config",
+  "name": "generator-ldf",
   "version": "1.0.0",
   "description": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rubensworks/generator-ldf-server-config"
+    "url": "https://github.com/rubensworks/generator-ldf"
   },
   "author": "rubensworks",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rubensworks/generator-ldf-server-config/issues"
+    "url": "https://github.com/rubensworks/generator-ldf/issues"
   },
-  "homepage": "https://github.com/rubensworks/generator-ldf-server-config",
+  "homepage": "https://github.com/rubensworks/generator-ldf",
   "files": [
     "server-config"
   ],
